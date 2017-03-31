@@ -265,8 +265,8 @@ class VersionCmd(Repltool):
             "set <pattern>",
             "Set the current version based on the given regular expression.",
             "Will set the version ALL modules.",
-            "MUST match ONE version in ALL modules.",
-            "MUST match at least one version in a module.",
+            "MUST match at most one version in ALL modules.",
+            "MUST match at least one version in ANY module.",
             "Use `list` to see what versions your filter matches.",
         ]))
 
