@@ -1,14 +1,14 @@
 #!/usr/bin/python
-
+import sys
+sys.path.insert(0, './lib')
 from cmd import Cmd as Repltool
 from StringIO import StringIO
 from subprocess import Popen, PIPE
 import argparse
 import csv
 import logging
-import sys
-import yaml
 import re
+import yaml
 
 
 # Resources:
