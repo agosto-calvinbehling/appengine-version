@@ -1,15 +1,16 @@
 #!/usr/bin/python
 import sys
 sys.path.insert(0, './lib')
+
 from cmd import Cmd as Repltool
 from StringIO import StringIO
 from subprocess import Popen, PIPE
 import argparse
 import csv
 import logging
+import os
 import re
 import yaml
-
 
 # Resources:
 # https://docs.python.org/2/library/argparse.html?highlight=py%20args#module-argparse
@@ -18,6 +19,25 @@ import yaml
 
 TEST_DATA = {'content': ['320-2-aac3d5f825', '300-hotfix2-864a8314e6', '310-2-af8ce4c702', '312-4-02417e1466', '313-8-9a0d6a0554', '313-9-9f65c9cdcb', '320-1-7ef044fd58', '325-1-28afd7b4fb', '325-2-9be3162894', '325-3-29bde01e75'], 'frontend': ['320-2-aac3d5f825', '313-8-9a0d6a0554', '313-87157e1d55', '313-9-9f65c9cdcb', '320-1-7ef044fd58', '325-1-28afd7b4fb', '325-2-9be3162894', '325-3-29bde01e75'], 'migration': ['320-2-aac3d5f825', '300-hotfix2-864a8314e6', '310-2-af8ce4c702', '312-4-02417e1466', '313-8-9a0d6a0554', '313-87157e1d55', '313-9-9f65c9cdcb', '320-1-7ef044fd58', '325-1-28afd7b4fb', '325-2-9be3162894', '325-3-29bde01e75'], 'default': ['320-2-aac3d5f825', '300-hotfix2-864a8314e6', '310-2-af8ce4c702', '312-4-02417e1466', '313-8-9a0d6a0554', '313-9-9f65c9cdcb', '320-1-7ef044fd58', '325-1-28afd7b4fb', '325-2-9be3162894', '325-3-29bde01e75', 'ah-builtin-datastoreservice', 'ah-builtin-python-bundle', 'ah-builtin-python-bundle'], 'backup': ['320-2-aac3d5f825', '300-hotfix2-864a8314e6', '310-2-af8ce4c702', '312-4-02417e1466', '313-8-9a0d6a0554', '313-9-9f65c9cdcb', '320-1-7ef044fd58', '325-1-28afd7b4fb', '325-2-9be3162894', '325-3-29bde01e75'], 'refresh': ['320-2-aac3d5f825', '320-1-7ef044fd58', '325-1-28afd7b4fb', '325-2-9be3162894', '325-3-29bde01e75']}
 TEST_DATA_ARRAY = [['VERSION', 'content', 'frontend', 'migration', 'default', 'backup', 'refresh'], ['300-hotfix2-864a8314e6', '-', '', '-', '-', '-', ''], ['310-2-af8ce4c702', '-', '', '-', '-', '-', ''], ['312-4-02417e1466', '-', '', '-', '-', '-', ''], ['313-8-9a0d6a0554', '-', '-', '-', '-', '-', ''], ['313-87157e1d55', '', '-', '-', '', '', ''], ['313-9-9f65c9cdcb', '-', '-', '-', '-', '-', ''], ['320-1-7ef044fd58', '-', '-', '-', '-', '-', '-'], ['320-2-aac3d5f825', '+', '+', '+', '+', '+', '+'], ['325-1-28afd7b4fb', '-', '-', '-', '-', '-', '-'], ['325-2-9be3162894', '-', '-', '-', '-', '-', '-'], ['325-3-29bde01e75', '-', '-', '-', '-', '-', '-'], ['ah-builtin-datastoreservice', '', '', '', '-', '', ''], ['ah-builtin-python-bundle', '', '', '', '-', '', '']]
+
+
+def which(program):
+
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+    fpath, fname = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            path = path.strip('"')
+            exe_file = os.path.join(path, program)
+            if is_exe(exe_file):
+                return exe_file
+
+    return None
 
 
 def _abort(msg, exit_code=1):
@@ -293,6 +313,11 @@ if __name__ == "__main__":
     parser.add_argument('-l', '--log-level', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'], default='INFO', help='Set the logging level')
     parser.add_argument('commands', nargs='*', help='run "? or help" for more info (without --)')
     args_namespace = parser.parse_known_args(sys.argv[1:])
+
+    if not which('appcfg.py'):
+        _abort("Requires 'appcfg.py'. Install the appengine sdk: https://cloud.google.com/sdk/downloads")
+    if not which('column'):
+        _abort("Requires 'column': http://man7.org/linux/man-pages/man1/column.1.html")
 
     log_level = args_namespace[0].log_level
     if log_level:
