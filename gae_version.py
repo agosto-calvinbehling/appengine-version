@@ -137,15 +137,20 @@ def filter_current(data):
     return {k: v[0] for k, v in data.iteritems()}
 
 
-def generate_human_array(data, current):
+def generate_human_array(data, current_map):
     module_list = data.keys()
-    version_list = sorted(list(set(sum(data.values(), []))))
+    version_set = set()
+    for value in data.values():
+        if isinstance(value, list):
+            version_set.update(value)
+        else:
+            version_set.add(value)
     headers = ['INDEX', 'VERSION'] + module_list
     result = [headers]
-    for idx, version in enumerate(version_list):
+    for idx, version in enumerate(sorted(version_set)):
         item = [idx, version]
         for m in module_list:
-            if version == current[m]:
+            if version == current_map[m]:
                 item.append('+')
             elif version in data[m]:
                 item.append('-')
@@ -268,6 +273,7 @@ class VersionCmd(Repltool):
         if self._data:
             current = filter_current(self._data)
             print_data_table(current, current)
+            return
         print('failed to fetch data')
 
     def do_set(self, pattern):
