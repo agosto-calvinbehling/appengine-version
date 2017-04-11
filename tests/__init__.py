@@ -1,0 +1,3 @@
+def setup_lib_path():
+    import sys
+    sys.path.insert(0, './lib')
