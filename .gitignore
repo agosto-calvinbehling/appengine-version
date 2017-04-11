@@ -1,0 +1,8 @@
+*.orig
+*.pyc
+*.pyo
+*.sav
+*.swo
+*.swp
+*.tmp
+*.vagrant
