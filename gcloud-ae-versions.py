@@ -16,7 +16,7 @@ from functools import wraps
 import re
 
 KEY_VERSION = 'id'
-KEY_MODULE = 'service'
+KEY_SERVICE = 'service'
 KEYS_INSTANCE_CLASS = ('version', 'instanceClass')
 KEY_TRAFFIC_SPLIT = 'traffic_split'
 
@@ -101,19 +101,19 @@ def gcloud_fetch_list(project):
 
 
 def version_table(raw, key=KEY_TRAFFIC_SPLIT):
-    data = multi_groupby(raw, KEY_MODULE, KEY_VERSION)
-    module_list = data.keys()
+    data = multi_groupby(raw, KEY_SERVICE, KEY_VERSION)
+    service_list = data.keys()
     version_set = set().union(*data.values())
 
-    headers = ['INDEX', 'VERSION'] + module_list
+    headers = ['INDEX', 'VERSION'] + service_list
     result = [[color.bold(str(item)) for item in headers]]
     for idx, version in enumerate(sorted(version_set)):
         active = False
         item = [color.grayscale[10](str(idx)), version]
-        for m in module_list:
-            if version in data[m]:
-                assert len(data[m][version]) == 1
-                value = data[m][version][0][key]
+        for service in service_list:
+            if version in data[service]:
+                assert len(data[service][version]) == 1
+                value = data[service][version][0][key]
                 if isinstance(value, float):
                     value = Decimal(value).normalize()
                     if value > 0:
@@ -134,10 +134,10 @@ def filter_current(raw, key=KEY_TRAFFIC_SPLIT):
     return [item for item in raw if item[key] > 0]
 
 
-def _gcloud_set_version(project, modules, version_string, cmd=VERSION_MIGRATE):
+def _gcloud_set_version(project, services, version_string, cmd=VERSION_MIGRATE):
     assert cmd in VERSION_COMMANDS
-    for m in modules:
-        command = 'gcloud --project {} --quiet app versions {} --service {} {}'.format(project, cmd, m, version_string)
+    for service in services:
+        command = 'gcloud --project {} --quiet app versions {} --service {} {}'.format(project, cmd, service, version_string)
         try:
             logging.debug(command)
             out, err = shell(command, pipe_stderr=False)
@@ -175,8 +175,8 @@ def gcloud_set_traffic(project, version_weight_dict, services=None, split_by=SPL
 
 
 def gcloud_set_version(project, data, version_string):
-    F = [item[KEY_MODULE] for item in data if get_nested_value(item, *KEYS_INSTANCE_CLASS).startswith('F')]
-    B = [item[KEY_MODULE] for item in data if get_nested_value(item, *KEYS_INSTANCE_CLASS).startswith('B')]
+    F = [item[KEY_SERVICE] for item in data if get_nested_value(item, *KEYS_INSTANCE_CLASS).startswith('F')]
+    B = [item[KEY_SERVICE] for item in data if get_nested_value(item, *KEYS_INSTANCE_CLASS).startswith('B')]
     _gcloud_set_version(project, B, version_string, cmd='start')
     _gcloud_set_version(project, F, version_string, cmd='migrate')
 
@@ -186,7 +186,7 @@ def regex_set_all(project, version_data, version_pattern):
     version_set = {item[KEY_VERSION] for item in filtered_data}
     num_versions = len(version_set)
     assert num_versions <= 1, 'Ambiguous version expression: {}'.format(version_pattern)
-    assert num_versions > 0, 'No module contained a version matching: {}'.format(version_pattern)
+    assert num_versions > 0, 'No service contained a version matching: {}'.format(version_pattern)
     version = version_set.pop()
     logging.info('version: {}'.format(version))
     return gcloud_set_traffic(project, {version: 1})
@@ -205,7 +205,7 @@ def filter_data(version_data, version_pattern, *keys):
 
 class VersionCmd(Repltool):
     intro = color.magenta('Select a project: "project <gcp project name>"\n' +
-        'Then list available versions/modules with "list"\n' +
+        'Then list available versions/service with "list"\n' +
         '"help" will list additional commands and how to use them\n')
     # _set_parser = set_version_parser()
 
@@ -252,7 +252,9 @@ class VersionCmd(Repltool):
         data = filter_data(self._data, pattern, KEY_VERSION)
         table = version_table(data)
         columnized = column(table)
-        result = [color.grayscale_bg[1](row) if idx % 2 else row for idx, row in enumerate(columnized)]
+        # alternating row colors
+        # result = [color.grayscale_bg[1](row) if idx % 2 else row for idx, row in enumerate(columnized)]
+        result = columnized
         print('\n'.join(result))
 
     def help_list(self):
@@ -260,8 +262,9 @@ class VersionCmd(Repltool):
             "list <pattern>"
             "Print the version table for the current project",
             "Filter the list by adding a regex pattern",
-            "'+' denotes the default version for the module/service",
-            "'-' denotes an available version for the module/service",
+            "'1' denotes the service version receives all traffic for that service",
+            "'0' denotes the service will not receive any traffic for that service",
+            "'0.XX' any other number denotes the percentage of traffic a version is serving"
         ]))
 
     @require_project
@@ -293,10 +296,10 @@ class VersionCmd(Repltool):
     def help_set(self):
         print('\n'.join([
             "set <pattern>",
-            "Set the current version based on the given regular expression.",
-            "Will set the version ALL modules.",
-            "MUST match at most one version in ALL modules.",
-            "MUST match at least one version in ANY module.",
+            "Set a version to receive ALL traffic destined to that service",
+            "Will set the version ALL services.",
+            "MUST match at most one version in ALL services.",
+            "MUST match at least one version in ANY service.",
             "Use `list` to see what versions your filter matches.",
         ]))
 
