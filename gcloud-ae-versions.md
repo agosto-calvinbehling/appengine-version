@@ -87,7 +87,7 @@ INDEX  VERSION                         frontend  default  refresh  content  migr
 ```
 
 ### List versions Filtered
-`python gcloud-ae-versions.py --project <project> list .*88
+`python gcloud-ae-versions.py --project <project> list .*88`
 ```
 INDEX  VERSION                  frontend  default  refresh  content  migration  backup
 0      392-0-5e108887a5         0         0        0        0        0          0     
@@ -96,4 +96,58 @@ INDEX  VERSION                  frontend  default  refresh  content  migration  
 3      sd-7192-01-880b96bd17              0                 0        0          0     
 4      sd-7199-01-c884da6d4b    1         1        1        1        1          1     
 5      test-sd-7039-880b96bd17  0         0        0        0        0          0     
+```
+
+### Set version
+`python gcloud-ae-versions.py --project <project name> set <pattern>`
+```
+> ./gcloud-ae-versions.py -A <PROJECT> set sd-7199
+
+2018-02-12 18:35:06,299 gcloud-ae-versions.py:191 version: sd-7199-01-c884da6d4b
+Setting the following traffic allocations:
+ - <PROJECT>/backup/sd-7199-01-c884da6d4b: 1.0
+ - <PROJECT>/content/sd-7199-01-c884da6d4b: 1.0
+ - <PROJECT>/default/sd-7199-01-c884da6d4b: 1.0
+ - <PROJECT>/frontend/sd-7199-01-c884da6d4b: 1.0
+ - <PROJECT>/migration/sd-7199-01-c884da6d4b: 1.0
+ - <PROJECT>/refresh/sd-7199-01-c884da6d4b: 1.0
+Any other versions on the specified services will receive zero traffic.
+Waiting for operation [apps/<PROJECT>/operations/69438ddd-da91-4e49-864f-bca4e42ba085] to complete...done.
+Waiting for operation [apps/<PROJECT>/operations/604582c6-f150-4083-93ac-2d0896c9871e] to complete...done.
+Waiting for operation [apps/<PROJECT>/operations/81759bfa-0298-4545-9e54-9c18c99987b1] to complete...done.
+Waiting for operation [apps/<PROJECT>/operations/221c6222-24aa-4f37-9853-d6cbe07a33a7] to complete...done.
+Waiting for operation [apps/<PROJECT>/operations/7a5d64ed-e526-48f8-b355-19df010819d8] to complete...done.
+Waiting for operation [apps/<PROJECT>/operations/6251aff8-82c4-4f2a-8daa-e115ae2c02d7] to complete...done.
+```
+
+### Interactive mode
+`python gcloud-ae-versions.py -i`
+```
+Select a project: "project <gcp project name>"
+Then list available versions/service with "list"
+"help" will list additional commands and how to use them
+
+(no project)> project skykit-display
+(skykit-display)> list
+INDEX  VERSION                   default
+0      23-57a6b55c49             0      
+1      24-dbf13faceb             0      
+2      25-e3306843f8             0      
+3      27-0606759d38             0      
+4      30-5aeea914f7             0      
+5      31-273e9364d9             0      
+6      33-bfd7f715eb             0      
+7      34-224a0c259e             0      
+8      35-d9817365f0             0      
+9      36-d9d020dbd6             0      
+10     38-28b4c9b450             0      
+11     40-c0abe63528             0      
+12     41-66cce4c95a             0      
+13     44-7c79eed8b9             1      
+14     44-karlk-7c79eed8b9       0      
+15     bootstraptest-689b033153  0      
+16     bootstraptest-9b6146235b  0      
+(skykit-display)> quit
+
+goodbye
 ```
