@@ -81,11 +81,13 @@ def fetch_data(project, *args, **kwargs):
     return result
 
 
-def print_data_table(data, current):
+def print_data_table(data, current, file=None):
     result = generate_human_array(data, current)
     csv_data = to_csv(result)
     output = generate_table(csv_data)
-    print(output)
+    if file is None:
+        file = sys.stdout
+    file.write(output + '\n')
 
 
 def set_version(project, version_string, modules, *args):
@@ -155,7 +157,7 @@ def generate_human_array(data, current_map):
             elif version in data[m]:
                 item.append('-')
             else:
-                item.append('')
+                item.append(' ')
         result.append(item)
     return result
 

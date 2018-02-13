@@ -1,0 +1,74 @@
+{
+    "frontend": [
+        "dummy-69311cd6ea",
+        "313-9-9f65c9cdcb",
+        "317-7e668b2b43",
+        "322-b354b87888",
+        "ci",
+        "ci2",
+        "raytest-59e3abcdcd"
+    ],
+    "default": [
+        "dummy-69311cd6ea",
+        "313-9-9f65c9cdcb",
+        "317-7e668b2b43",
+        "322-b354b87888",
+        "ah-builtin-datastoreservice",
+        "ah-builtin-python-bundle",
+        "ci",
+        "ci2",
+        "raytest-59e3abcdcd"
+    ],
+    "refresh": [
+        "dummy-69311cd6ea",
+        "317-7e668b2b43",
+        "322-b354b87888",
+        "ci",
+        "ci2",
+        "test-single"
+    ],
+    "content": [
+        "dummy-69311cd6ea",
+        "313-9-9f65c9cdcb",
+        "317-7e668b2b43",
+        "322-b354b87888",
+        "ci",
+        "ci2",
+        "raytest-59e3abcdcd"
+    ],
+    "migration": [
+        "dummy-69311cd6ea",
+        "11-88f89eb760",
+        "11-ddd271af2f",
+        "12-ddd271af2f",
+        "274-1dd9cba6a4",
+        "274-b57f1b50e7",
+        "277-3adf4e6118",
+        "277-d91744cc08",
+        "293-cecb1aef42",
+        "310-982e38b9a1",
+        "313-9-9f65c9cdcb",
+        "317-7e668b2b43",
+        "322-b354b87888",
+        "ci-0ba28e6705",
+        "ci-a7ff89b102",
+        "ci-ba7463c40f",
+        "ci-ea4ecddf75",
+        "ci",
+        "ci2",
+        "karlktest",
+        "raytest-59e3abcdcd"
+    ],
+    "backup": [
+        "dummy-69311cd6ea",
+        "293-cecb1aef42",
+        "310-982e38b9a1",
+        "313-9-9f65c9cdcb",
+        "317-7e668b2b43",
+        "322-b354b87888",
+        "ci",
+        "ci2",
+        "raytest-59e3abcdcd",
+        "snapshot"
+    ]
+}
